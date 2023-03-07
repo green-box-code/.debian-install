@@ -1,0 +1,194 @@
+vim9script
+var Dotfiles = $HOME .. "/.dotfiles/"
+import Dotfiles .. 'MyScripts.vim'
+# Settings
+  syntax on
+  set nocompatible
+  set cmdheight=3
+  filetype off
+  set noswapfile
+  set backspace=indent,eol,start
+  set history=100
+  set wildmenu
+  set hlsearch
+  set incsearch
+  set ignorecase
+  set showmatch
+  set lazyredraw
+  set path+=**
+  set colorcolumn=80,90
+  set textwidth=79
+  hi MatchParen cterm=none ctermbg=green ctermfg=blue
+  # g:ale_completion_enabled = 1
+# Vundle and Plugins
+# ----
+  set rtp+=~/.vim/bundle/Vundle.vim
+  call vundle#begin()
+# Plugins
+  Plugin 'gmarik/Vundle.vim'
+  Plugin 'dense-analysis/ale'
+  Plugin 'sainnhe/gruvbox-material'
+  Plugin 'vim-airline/vim-airline'
+  Plugin 'vim-airline/vim-airline-themes'
+  Plugin 'mhinz/vim-startify'
+  Plugin 'preservim/nerdtree'
+  Plugin 'honza/vim-snippets'
+  Plugin 'tpope/vim-fugitive'
+
+  call vundle#end()            # required
+  filetype plugin indent on    # required
+# Startify
+  g:startify_bookmarks = ['~', '~/.dotfiles', '.config', '~/.dotfiles/vimrc',
+  \ '~/.dotfiles/zshrc', '~/scratch-pad.txt', '~/appt.txt',
+  \ '~/projects/python', '~/projects/Cpp',
+  \ '~/.dotfiles/MyNotes/myNotes.tex']
+
+# VImWiki
+  g:vimwiki_list = [{'path': '~/Documents/wiki/', 'syntax': 'markdown'}]
+  au FileType vimwiki setlocal shiftwidth=4 tabstop=4 noexpandtab
+# NerdTree
+  g:NERDTreeShowHidden = 1
+# Gruvbox-Material
+  set background=dark
+  g:gruvbox_material_background = 'hard'
+  g:gruvbox_material_better_performance = 1
+  colorscheme gruvbox-material
+# ultisnips
+  g:UltiSnipsExpandTrigger = "<tab>"
+  g:UltiSnipsJumpForwardTrigger = "<c-b>"
+  g:UltiSnipsJumpBackwardTrigger = "<c-z>"
+
+# Airline
+  if !exists('g:airline_symbols')
+    g:airline_symbols = {}
+  endif
+  # powerline symbols
+  g:airline_left_sep = ''
+  g:airline_left_alt_sep = ''
+  g:airline_right_sep = ''
+  g:airline_right_alt_sep = ''
+  g:airline_symbols.branch = ''
+  g:airline_symbols.readonly = ''
+  g:airline_symbols.linenr = '☰'
+  g:airline_symbols.maxlinenr = ''
+  g:airline_symbols.dirty = '⚡'
+  g:airline#extensions#tabline#enabled = 1
+  g:airline_theme = 'gruvbox_material'
+# Ale - Linting and fixing
+  b:ale_fixers = ['vint', 'prettier', 'flake8',
+  \ 'remove_trailing_lines', 'trim_whitespace']
+# Remapping
+  # Leader
+    g:mapleader = ";"
+  # Nav
+    nnoremap <C-j> <C-W><C-J>
+    nnoremap <C-k> <C-W><C-k>
+    nnoremap <C-l> <C-W><C-l>
+    nnoremap <C-h> <C-W><C-h>
+  # Quit this Bitch
+    nnoremap qq :wq <cr>
+    nnoremap q1 :q!<cr>
+    nnoremap qa :qa!<cr>
+    inoremap qq <esc>:wq<cr>
+    inoremap q1 <esc>:q!<cr>
+    inoremap qa <esc>:qa!<cr>
+  # Save without QUiting
+    nnoremap <leader>w :w<cr>
+  # Open MyNotes.tex
+    nnoremap <leader>mn <esc>:tabnew ~/.dotfiles/MyNotes/myNotes.tex<cr>
+  # Calendar
+    au BufRead *.wiki
+    \nnoremap <buffer><leader>dl :VimwikiDiaryGenerateLinks
+    \nnoremap <buffer><leader>dd :VimwikiDiaryIndex
+  # Nerdtree
+    nnoremap <leader>n :NERDTreeFocus<CR>
+    nnoremap <C-n> :NERDTree<CR>
+    nnoremap <C-t> :NERDTreeToggle<CR>
+    nnoremap <C-f> :NERDTreeFind<CR>
+  # ()Braketing
+    inoremap <leader>p ()<esc>i
+    inoremap <leader>[ []<esc>i
+    inoremap <leader>b {}<esc>i
+    inoremap <leader>, <><esc>i
+    inoremap <leader>' ''<esc>i
+    inoremap <leader>'' ""<esc>i
+  # Brackets the word
+    nnoremap <leader>p bi(<esc>ea)<esc>
+    nnoremap <leader>[ bi[<esc>ea]<esc>
+    nnoremap <leader>b bi{<esc>ea}<esc>
+    nnoremap <leader>, bi<<esc>ea><esc>
+    nnoremap <leader>' bi'<esc>ea'<esc>
+    nnoremap <leader>'' bi"<esc>ea"<esc>
+  # Bracket Visual Selection
+    vnoremap <leader>p c()<ESC>P
+    vnoremap <leader>[ c[]<esc>p
+    vnoremap <leader>b c{}<esc>p
+    vnoremap <leader>, c<><esc>p
+    vnoremap <leader>' c''<esc>p
+    vnoremap <leader>'' c""<esc>p
+
+    # Ctags
+    nnoremap <leader>tt <ScriptCmd>MyScripts.MyCtags()<cr>
+  # Clear trailing whitespace
+    nnoremap <leader>ws <ScriptCmd>Preserve(":%s/\\s\\+$//e")<cr>
+    nnoremap <leader>l <ScriptCmd>MyScripts.LogThis()<cr>
+  # Reload .vimrc
+    nnoremap <leader>r :source ~/.vimrc<cr>
+  # VimTex
+  augroup Latex
+    au!
+    au FileType tex,plaintex nnoremap <buffer><leader>s   
+    \<ScriptCmd>MyScripts.VimTex_Section()<cr>i
+    au FileType tex,plaintex nnoremap <buffer><leader>ss  
+    \<ScriptCmd>MyScripts.VimTex_SubSection()<cr>i
+    au FileType tex,plaintex nnoremap <buffer><leader>sss 
+    \<ScriptCmd>MyScripts.VimTex_SubSubSection()<cr>i
+    au FileType tex,plaintex nnoremap <buffer><leader>i <ScriptCmd>MyScripts.VimTex_TagIndex()<cr>i
+
+    au FileType tex,plaintex nnoremap <buffer><leader>ts <ScriptCmd>MyScripts.VimTex_DateStamp()<cr>
+
+    au FileType tex,plaintex nnoremap <buffer><leader>nl 
+    \<ScriptCmd>MyScripts.VimTex_BeginItemList()<cr>i 
+    au FileType tex,plaintex nnoremap <buffer><leader>ni 
+    \<ScriptCmd>MyScripts.VimTex_NewItem()<cr>i 
+  augroup END
+# Comment out a line
+  au FileType vim,python,bash nnoremap <leader>c I# <esc>
+  au FileType c,cpp nnoremap <leader>c I// <esc>
+  au FileType lua nnoremap <leader>c I-- <esc>
+  au FileType plaintex nnoremap <leader>c I% <esc>
+# Python Tab Setup
+  au BufNewFile,BufRead *.py
+    \setlocal tabstop=4|
+    \set softtabstop=4|
+    \set shiftwidth=4|
+    \set textwidth=79|
+    \set expandtab|
+    \set autoindent|
+    \set fileformat=unix
+# Latex Tab Setup
+  # au BufNewFile,BufRead *.tex
+    # \setlocal tabstop=4|
+    # \set softtabstop=4|
+    # \set shiftwidth=4|
+    # \set textwidth=79|
+    # \set expandtab|
+    # \set fileformat=unix
+# Tabs
+  set shiftwidth=2
+  set tabstop=2
+  set expandtab
+# Cursor
+  set number relativenumber
+  set nu rnu
+  set cursorline
+  set cursorcolumn
+# Small scripts for .vimrc
+def Preserve(Acomm: string)
+   # Preparation: save window state
+   var saved_winview = winsaveview()
+    # Run the command:
+    execute Acomm
+    # Clean up: restore previous window position
+    call winrestview(saved_winview)
+ enddef
